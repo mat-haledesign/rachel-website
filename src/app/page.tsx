@@ -36,56 +36,56 @@ export default function Home() {
 
   // Fetch items whenever selectedTab changes
   useEffect(() => {
-    async function fetchItems() {
-      setShowGrid(false); // hide grid to restart animation
-      imageRefs.current = []; // reset refs
+  async function fetchItems() {
+    // 1️⃣ Immediately update hero text
+    setHeroText(selectedTab === 'overview' ? 'Rachel Buckland' : selectedTab.toUpperCase());
 
-      const query = queries[selectedTab];
-      const data = await client.fetch(query);
+    // 2️⃣ Hide grid and reset refs
+    setShowGrid(false);
+    imageRefs.current = [];
 
-      if (Array.isArray(data)) {
-        type SanityItem = {
-          _id: string;
-          title: string;
-          imageUrl: string;
-          hasVideo?: boolean;
-          videoUrl?: string;
-        };
+    // 3️⃣ Fetch data from Sanity
+    const query = queries[selectedTab];
+    const data = await client.fetch(query);
 
-        const items = data.map((item: SanityItem) => ({
+    if (Array.isArray(data)) {
+      type SanityItem = {
+        _id: string;
+        title: string;
+        imageUrl: string;
+        hasVideo?: boolean;
+        videoUrl?: string;
+      };
 
-          id: item._id,
-          title: item.title,
-          url: item.imageUrl,
-          hasVideo: !!item.hasVideo,
-          videoUrl: item.videoUrl || undefined,
-        }));
-        setOverviewItems(items);
+      const items = data.map((item: SanityItem) => ({
+        id: item._id,
+        title: item.title,
+        url: item.imageUrl,
+        hasVideo: !!item.hasVideo,
+        videoUrl: item.videoUrl || undefined,
+      }));
+      setOverviewItems(items);
 
-        await Promise.all(
-          items.map(
-            (item) =>
-              new Promise<void>((resolve) => {
-                const img = new Image();
-                img.src = item.url;
-                img.onload = () => resolve();
-                img.onerror = () => resolve(); // continue even if an image fails
-              })
-          )
-        );
-      }
-
-      // Update hero text based on tab
-      setHeroText(selectedTab === 'overview' ? 'Rachel Buckland' : selectedTab.toUpperCase());
-
-      // Wait for hero animation to finish before showing grid
-      const heroAnimationDuration = 2200; // duration of hero text animation
-      await new Promise((resolve) => setTimeout(resolve, heroAnimationDuration));
-      setShowGrid(true);
+      // 4️⃣ Preload images (optional, keeps smooth grid animation)
+      await Promise.all(
+        items.map(
+          (item) =>
+            new Promise<void>((resolve) => {
+              const img = new Image();
+              img.src = item.url;
+              img.onload = () => resolve();
+              img.onerror = () => resolve();
+            })
+        )
+      );
     }
 
-    fetchItems();
-  }, [selectedTab]);
+    await new Promise((resolve) => setTimeout(resolve, 2200));
+    setShowGrid(true);
+  }
+
+  fetchItems();
+}, [selectedTab]);
 
   // Animate images when they enter viewport
   useEffect(() => {
