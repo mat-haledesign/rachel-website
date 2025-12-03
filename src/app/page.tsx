@@ -1,5 +1,6 @@
 'use client';
 
+
 import { useEffect, useState, useRef } from 'react';
 import { client } from '../sanity/lib/client';
 import {
@@ -43,7 +44,16 @@ export default function Home() {
       const data = await client.fetch(query);
 
       if (Array.isArray(data)) {
-        const items = data.map((item: any) => ({
+        type SanityItem = {
+          _id: string;
+          title: string;
+          imageUrl: string;
+          hasVideo?: boolean;
+          videoUrl?: string;
+        };
+
+        const items = data.map((item: SanityItem) => ({
+
           id: item._id,
           title: item.title,
           url: item.imageUrl,
@@ -145,14 +155,14 @@ export default function Home() {
       {/* Bottom buttons */}
       <div className="fixed bottom-[clamp(2vw,2vh,4vw)] [@media(min-width:1080px)_and_(min-aspect-ratio:1/1)]:bottom-0 left-0 w-full items-end [@media(min-width:1080px)_and_(min-aspect-ratio:1/1)]:h-[10vh] flex [@media(min-width:1080px)_and_(min-aspect-ratio:1/1)]:items-center justify-between px-[clamp(5vw,4vh,8vw)] [@media(min-width:1080px)_and_(min-aspect-ratio:1/1)]:px-[clamp(11vh,7vw,14vh)] z-30 pointer-events-none">
         <div className="flex space-y-[clamp(2vw,2vh,4vw)] [@media(min-width:1080px)_and_(min-aspect-ratio:1/1)]:space-y-0 [@media(min-width:1080px)_and_(min-aspect-ratio:1/1)]:space-x-[clamp(0.5vh,0.75vw,1.5vh)] pointer-events-auto flex-col [@media(min-width:1080px)_and_(min-aspect-ratio:1/1)]:flex-row">
-          {['overview', 'corporate', 'student', 'nature'].map((tab) => (
+          {(['overview', 'corporate', 'student', 'nature'] as const).map((tab: 'overview' | 'corporate' | 'student' | 'nature') => (
             <button
               key={tab}
               className={`uppercase px-[clamp(0.5vw,1vh,2vw)] [@media(min-width:1080px)_and_(min-aspect-ratio:1/1)]:px-[clamp(0.2vw,1vh,0.5vw)] py-[clamp(0.5vw,0.6vh,1.2vw)] [@media(min-width:1080px)_and_(min-aspect-ratio:1/1)]:py-[clamp(0.1vw,0.6vh,0.3vw)] text-[clamp(2vw,1.75vh,3.5vw)] [@media(min-width:1080px)_and_(min-aspect-ratio:1/1)]:text-[clamp(0.2vw,1vh,0.5vw)] border border-black font-sans font-bold transition-colors duration-300 cursor-pointer ${selectedTab === tab
                 ? 'bg-black text-white'
                 : 'bg-[#F7F5F1] text-black hover:bg-black hover:text-white'
                 }`}
-              onClick={() => setSelectedTab(tab as any)}
+              onClick={() => setSelectedTab(tab as 'overview' | 'corporate' | 'student' | 'nature')}
             >
               {tab.charAt(0).toUpperCase() + tab.slice(1)}
             </button>
