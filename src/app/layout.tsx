@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Rachel Buckland",
-  description: "A digital collection of work.",
+  description: "Welcome to my portfolio! I create photography and videography that tells stories, captures emotions, and brings ideas to life.",
 };
 
 export default function RootLayout({
